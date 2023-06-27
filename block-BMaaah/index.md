@@ -1,173 +1,262 @@
-writeCode
+// writeCode
 
-Write code to execute below expressions.
+// Write code to execute below expressions.
 
-1. Create a database named `blog`.
-2. Create a collection called 'articles'.
-3. Insert multiple documents(at least 3) into articles. It should have fields
-
-- title as string
-- createdAt as date
-- details as String
-- author as nested object
-  - author should have
-    - name
-    - email
-    - age
-    - example author: {name: 'abc', email: 'abc@gmail', age: 25}
-- tags : Array of strings like ['html', 'css']
-
-```js
-// An article should look like in the database
+// 1. Create a database named `blog`.
+use blog
+// 2. Create a collection called 'articles'.
+db.createCollection("articles")
+// 3. Insert multiple documents(at least 3) into articles. It should have fields
+db.articles.insertMany([// Article 1
 {
-  _id: 'some_random_id',
-  title: '',
-  details: '',
+  _id: ObjectId("60d5b921f6f47847c8000001"),
+  title: "Introduction to JavaScript",
+  details: "JavaScript is a popular programming language used for web development.",
   author: {
-    name: '',
-    email: '',
-    age: ''
+    name: "John Doe",
+    email: "johndoe@example.com",
+    age: 30
   },
-  tags: ['js', 'mongo']
+  tags: ["javascript", "web development"]
+},
+
+// Article 2
+{
+  _id: ObjectId("60d5b921f6f47847c8000002"),
+  title: "Getting Started with MongoDB",
+  details: "MongoDB is a NoSQL database used for storing and managing data.",
+  author: {
+    name: "Jane Smith",
+    email: "janesmith@example.com",
+    age: 28
+  },
+  tags: ["mongodb", "database"]
+},
+
+// Article 3
+{
+  _id: ObjectId("60d5b921f6f47847c8000003"),
+  title: "CSS Basics for Styling Web Pages",
+  details: "CSS (Cascading Style Sheets) is a styling language used to control the presentation of web pages.",
+  author: {
+    name: "Alice Johnson",
+    email: "alicejohnson@example.com",
+    age: 35
+  },
+  tags: ["css", "web development"]
 }
+])
+// - title as string
+// - createdAt as date
+// - details as String
+// - author as nested object
+//   - author should have
+//     - name
+//     - email
+//     - age
+//     - example author: {name: 'abc', email: 'abc@gmail', age: 25}
+// - tags : Array of strings like ['html', 'css']
+
+// ```js
+// // An article should look like in the database
+// {
+//   _id: 'some_random_id',
+//   title: '',
+//   details: '',
+//   author: {
+//     name: '',
+//     email: '',
+//     age: ''
+//   },
+//   tags: ['js', 'mongo']
+// }
+// ```
+
+// 4. Find all the articles using `db.COLLECTION_NAME.find()`
+db.articles.find()
+// 5. Find a document using \_id field.
+db.articles.find({_id: ObjectId("60d5b921f6f47847c8000001")})
+// 6. 1. Find documents using title
+db.articles.find({title: 'CSS Basics for Styling Web Pages'})
+// 7. 2. Find documents using author's name field.
+db.articles.find({ "author.name": "Alice Johnson" })
+// 8. Find document using a specific tag.
+db.articles.find({ "tags": "css" })
+
+
+// 9. Update title of a document using its \_id field.
+db.articles.update({_id: ObjectId("60d5b921f6f47847c8000001")}, {$set: {title: "And My name is John Cena"}})
+// 10. Update a author's name using article's title.
+db.articles.update({title: "And My name is John Cena"}, {$set: {"author.name": "WWE sports"}});
+// 11. rename details field to description from all articles in articles collection.
+db.articles.updateMany({}, { $rename: { "details": "description" } })
+db.articles.update(
+    {},
+    { $rename: { "details": "description" } },
+    { multi: true }
+  )
+  
+// 12. Add additional tag in a specific document.
+db.articles.updateOne({title: "And My name is John Cena"}, {$push: {"tags": "WWE"}})
+
+// 13. Update an article's title using $set and without $set.
+db.articles.update({title: "And My name is John Cena"}, {$set: {"title": "Run Forest Run"}})
+db.articles.update({"title": "Run Forest Run"}, {"title": "Fly Forest Fly"})
+// - Write the differences here ?
+```md
+MongoInvalidArgumentError: Update document requires atomic operators
+In the updated versions of mongoDB, when updating a document, you must use atomic update operators like $set to modify specific fields. Without using atomic operators, you cannot directly update a single field.
+
+To replace the whole document we can do this:
+db.articles.replaceOne(
+    { title: "Run Forest Run" },
+    {
+      title: "Fly Forest Fly",
+      details: "New details for the article",
+      author: {
+        name: "John Doe",
+        email: "johndoe@example.com",
+        age: 30
+      },
+      tags: ["newTag1", "newTag2"]
+    }
+  )
+  
+
 ```
+// 13. find an article using title and increment it's auhtor's age by 5.
+db.articles.updateOne({title:"Fly Forest Fly"}, {$set : {"author.age" : `35`}})
 
-4. Find all the articles using `db.COLLECTION_NAME.find()`
-5. Find a document using \_id field.
-6. 1. Find documents using title
-7. 2. Find documents using author's name field.
-8. Find document using a specific tag.
+// 14. Delete a document using \_id field with `db.COLLECTION_NAME.remove()`.
+db.articles.deleteOne({_id: ObjectId("60d5b921f6f47847c8000001")})
 
-9. Update title of a document using its \_id field.
-10. Update a author's name using article's title.
-11. rename details field to description from all articles in articles collection.
-12. Add additional tag in a specific document.
+// // Sample data
 
-13. Update an article's title using $set and without $set.
+// ```js
+// db.users.insertMany([
+//   {
+//     age: 49,
+//     name: "Maurice Brock",
+//     email: "wuk@hibpiz.ch",
+//     gender: "Female",
+//     sports: ["cricket", "football"],
+//     scores: [24, 35, 18, 16],
+//     weight: 45,
+//   },
+//   {
+//     age: 37,
+//     birthday: "7/15/1986",
+//     name: "Virgie Cunningham",
+//     email: "ezogafa@de.gm",
+//     gender: "Male",
+//     sports: ["football"],
+//     scores: [17, 35, 43],
+//     weight: 52,
+//   },
+//   {
+//     age: 48,
+//     birthday: "5/14/1961",
+//     name: "Alexander Holt",
+//     email: "han@mu.pe",
+//     gender: "Male",
+//     sports: ["cricket", "football", "TT"],
+//     scores: [24, 30, 16],
+//     weight: 55,
+//   },
+//   {
+//     age: 53,
+//     birthday: "11/15/1963",
+//     name: "Derek Dawson",
+//     email: "polril@now.de",
+//     gender: "Male",
+//     sports: ["cricket", "hockey"],
+//     scores: [20, 15, 38, 23],
+//     weight: 49,
+//   },
+//   {
+//     age: 34,
+//     birthday: "7/24/1964",
+//     name: "Cynthia Cobb",
+//     email: "wujjarpob@jecimpar.gu",
+//     gender: "Female",
+//     sports: ["cricket"],
+//     scores: [41, 17, 28],
+//     weight: 51,
+//   },
+//   {
+//     age: 33,
+//     birthday: "10/26/1982",
+//     name: "Isabella Atkins",
+//     email: "ononuzas@givhoz.ca",
+//     gender: "Female",
+//     sports: ["cricket", "football", "hockey", "TT"],
+//     scores: [14, 38, 29, 45, 20],
+//     weight: 49,
+//   },
+//   {
+//     age: 47,
+//     birthday: "10/12/1978",
+//     name: "Katharine Bryan",
+//     email: "zo@pebi.sa",
+//     gender: "Male",
+//     sports: ["TT", "hockey", "khokho"],
+//     scores: [27, 20, 34],
+//     weight: 58,
+//   },
+//   {
+//     age: 41,
+//     birthday: "1/28/1991",
+//     name: "Beatrice Fleming",
+//     email: "ufufsa@pujizren.tk",
+//     gender: "Female",
+//     sports: ["football", "khokho"],
+//     scores: [30, 20, 15, 29, 43],
+//     weight: 47,
+//   },
+//   {
+//     age: 26,
+//     birthday: "3/23/1998",
+//     name: "Tom Fields",
+//     email: "wasodjow@ofaba.gf",
+//     gender: "Female",
+//     sports: ["khokho"],
+//     scores: [37, 29, 18, 43, 49],
+//     weight: 50,
+//   },
+//   {
+//     age: 33,
+//     birthday: "11/14/1960",
+//     name: "Steve Ortega",
+//     email: "dupus@ca.ls",
+//     gender: "Female",
+//     sports: ["cricket", "football", "hockey"],
+//     scores: [12, 15, 20],
+//     weight: 51,
+//   },
+//   {
+//     age: 24,
+//     birthday: "1/5/1994",
+//     name: "Suraj Kumar",
+//     weight: 50,
+//     gender: "Male",
+//     sports: ["football", "cricket", "TT"],
+//   },
+// ]);
+// ```
 
-- Write the differences here ?
+// Insert above data into database to perform below queries:-
 
-13. find an article using title and increment it's auhtor's age by 5.
+// - Find all males who play cricket.
+db.users.find({gender: "Male", sports: "cricket"})
+// - Update user with extra golf field in sports array whose name is "Steve Ortega".
+db.users.updateOne(
+    { name: "Steve Ortega" },
+    { $push: { sports: "golf" } }
+  )
+  
+// - Find all users who play either 'football' or 'cricket'.
+db.users.find({$or:[{sports:"football"},{sports:"cricket"}]})
 
-14. Delete a document using \_id field with `db.COLLECTION_NAME.remove()`.
+// - Find all users whose name includes 'ri' in their name.
+db.users.find({ name: { $regex: 'ri', $options: 'i' } })
 
-// Sample data
-
-```js
-db.users.insertMany([
-  {
-    age: 49,
-    name: "Maurice Brock",
-    email: "wuk@hibpiz.ch",
-    gender: "Female",
-    sports: ["cricket", "football"],
-    scores: [24, 35, 18, 16],
-    weight: 45,
-  },
-  {
-    age: 37,
-    birthday: "7/15/1986",
-    name: "Virgie Cunningham",
-    email: "ezogafa@de.gm",
-    gender: "Male",
-    sports: ["football"],
-    scores: [17, 35, 43],
-    weight: 52,
-  },
-  {
-    age: 48,
-    birthday: "5/14/1961",
-    name: "Alexander Holt",
-    email: "han@mu.pe",
-    gender: "Male",
-    sports: ["cricket", "football", "TT"],
-    scores: [24, 30, 16],
-    weight: 55,
-  },
-  {
-    age: 53,
-    birthday: "11/15/1963",
-    name: "Derek Dawson",
-    email: "polril@now.de",
-    gender: "Male",
-    sports: ["cricket", "hockey"],
-    scores: [20, 15, 38, 23],
-    weight: 49,
-  },
-  {
-    age: 34,
-    birthday: "7/24/1964",
-    name: "Cynthia Cobb",
-    email: "wujjarpob@jecimpar.gu",
-    gender: "Female",
-    sports: ["cricket"],
-    scores: [41, 17, 28],
-    weight: 51,
-  },
-  {
-    age: 33,
-    birthday: "10/26/1982",
-    name: "Isabella Atkins",
-    email: "ononuzas@givhoz.ca",
-    gender: "Female",
-    sports: ["cricket", "football", "hockey", "TT"],
-    scores: [14, 38, 29, 45, 20],
-    weight: 49,
-  },
-  {
-    age: 47,
-    birthday: "10/12/1978",
-    name: "Katharine Bryan",
-    email: "zo@pebi.sa",
-    gender: "Male",
-    sports: ["TT", "hockey", "khokho"],
-    scores: [27, 20, 34],
-    weight: 58,
-  },
-  {
-    age: 41,
-    birthday: "1/28/1991",
-    name: "Beatrice Fleming",
-    email: "ufufsa@pujizren.tk",
-    gender: "Female",
-    sports: ["football", "khokho"],
-    scores: [30, 20, 15, 29, 43],
-    weight: 47,
-  },
-  {
-    age: 26,
-    birthday: "3/23/1998",
-    name: "Tom Fields",
-    email: "wasodjow@ofaba.gf",
-    gender: "Female",
-    sports: ["khokho"],
-    scores: [37, 29, 18, 43, 49],
-    weight: 50,
-  },
-  {
-    age: 33,
-    birthday: "11/14/1960",
-    name: "Steve Ortega",
-    email: "dupus@ca.ls",
-    gender: "Female",
-    sports: ["cricket", "football", "hockey"],
-    scores: [12, 15, 20],
-    weight: 51,
-  },
-  {
-    age: 24,
-    birthday: "1/5/1994",
-    name: "Suraj Kumar",
-    weight: 50,
-    gender: "Male",
-    sports: ["football", "cricket", "TT"],
-  },
-]);
-```
-
-Insert above data into database to perform below queries:-
-
-- Find all males who play cricket.
-- Update user with extra golf field in sports array whose name is "Steve Ortega".
-- Find all users who play either 'football' or 'cricket'.
-- Find all users whose name includes 'ri' in their name.
